@@ -9,11 +9,11 @@ WHITESPACE = [\s\t\n\r]
 
 Rules.
 
-<{ALNUM}+>         : {token, {opentag,  TokenLine, TokenChars}}.
-</{ALNUM}+>         : {token, {closetag,  TokenLine, TokenChars}}.
-{D}+\.{D}+        : {token, {float, TokenLine, list_to_float(TokenChars)}}.
-{D}+        : {token, {integer, TokenLine, list_to_integer(TokenChars)}}.
-{ALPHA}+   : {token, {string, TokenLine, TokenChars}}.
+<({ALNUM})+>    : {token, {opentag, lists:sublist(TokenChars, 2, TokenLen-2)}}.
+</({ALNUM})+>   : {token, {closetag, lists:sublist(TokenChars, 3, TokenLen-3)}}.
+{D}+\.{D}+      : {token, {float, list_to_float(TokenChars)}}.
+{D}+            : {token, {integer, list_to_integer(TokenChars)}}.
+{ALPHA}+        : {token, {string, TokenChars}}.
 
 {WHITESPACE}+ : skip_token.
 
