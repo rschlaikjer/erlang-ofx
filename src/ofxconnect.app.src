@@ -1,0 +1,19 @@
+{application, ofxconnect,
+ [{description, "OFX Connector"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { ofxconnect_app, []}},
+  {applications,
+   [kernel,
+    lager,
+    uuid,
+    stdlib,
+    runtime_tools
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.
