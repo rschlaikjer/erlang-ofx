@@ -3,7 +3,7 @@
 %% Leaves can have a string value and no children.
 -record(ofx_node, {
           name :: nonempty_string(),
-          value :: [{any(), any()}]
+          children :: [{any(), any()}]
          }).
 -record(ofx_leaf, {
           name :: nonempty_string(),

@@ -2,7 +2,7 @@
 -include("include/records.hrl").
 -compile(export_all).
 
-marshal(#ofx_node{name=Name, value=Children}) ->
+marshal(#ofx_node{name=Name, children=Children}) ->
     [
      "<", Name, ">",
      [marshal(Child) || Child <- Children],
@@ -25,5 +25,5 @@ do_parse([{opentag, Tag}|[{string, Value}|Tags]]) ->
 do_parse([{opentag, Tag}|[{opentag, ChildTag}|Tags]]) ->
     #ofx_node{
        name=Tag,
-       value=[do_parse([{opentag, ChildTag}|Tags])]
+       children=[do_parse([{opentag, ChildTag}|Tags])]
     }.
