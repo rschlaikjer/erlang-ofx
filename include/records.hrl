@@ -1,3 +1,6 @@
+%% Records for representing a SGML OFX document as a tree.
+%% Nodes may have one or more children, but no value.
+%% Leaves can have a string value and no children.
 -record(ofx_node, {
           name :: nonempty_string(),
           value :: [{any(), any()}]
