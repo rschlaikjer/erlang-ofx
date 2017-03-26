@@ -3,7 +3,7 @@ Definitions.
 U = [A-Z]
 L = [a-z]
 D = [0-9]
-SYM = [_\-.:/*+]
+SYM = [_\-.:/*+\[\]']
 WHITESPACE = [\s\t\n\r]
 ALPHA = ({U}|{L})
 ALNUM = ({ALPHA}|{D})
