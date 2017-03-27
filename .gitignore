@@ -2,6 +2,6 @@ _build/
 *.dump
 rebar.lock
 *.beam
-src/ofxconnect_test.erl
+src/ofx_test.erl
 log
-priv/ofxconnect_leex.erl
+priv/ofx_leex.erl

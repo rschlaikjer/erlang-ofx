@@ -1,8 +1,8 @@
--module(ofxconnect_client).
+-module(ofx_client).
 -compile([{parse_transform, lager_transform}]).
 -behaviour(gen_server).
 
--include_lib("ofxconnect/include/records.hrl").
+-include_lib("ofx/include/records.hrl").
 -define(TIMEOUT, infinity).
 -define(CLIENTUID, "b2f82e64-ca94-45e1-b947-b9007cd3cd08").
 
@@ -113,7 +113,7 @@ do_list_accounts(State=#state{}) ->
 
 req_and_parse_resp(Url, OfxStanzas) ->
     % Combine the OFX request stanzas into a document
-    OfxDocument = ofxconnect_parser:marshal(
+    OfxDocument = ofx_parser:marshal(
          #ofx_node{
             name="OFX",
             children=OfxStanzas
@@ -129,7 +129,7 @@ req_and_parse_resp(Url, OfxStanzas) ->
     OfxResponse = extract_ofx_from_response(Response),
 
     % Parse and return the response
-    ofxconnect_parser:unmarshal(OfxResponse).
+    ofx_parser:unmarshal(OfxResponse).
 
 extract_ofx_from_response(Response) ->
     % Find the index of the <OFX> start tag

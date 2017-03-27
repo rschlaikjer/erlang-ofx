@@ -1,4 +1,4 @@
--module(ofxconnect_sup).
+-module(ofx_sup).
 
 -behaviour(supervisor).
 
@@ -36,10 +36,10 @@ init([]) ->
 %%====================================================================
 
 child_spec() -> {
-    ofxconnect_client,
-    {ofxconnect_client, start_link, []},
+    ofx_client,
+    {ofx_client, start_link, []},
     transient,
     3000,
     worker,
-    [ofxconnect_client]
+    [ofx_client]
 }.

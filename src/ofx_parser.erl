@@ -1,5 +1,5 @@
--module(ofxconnect_parser).
--include_lib("ofxconnect/include/records.hrl").
+-module(ofx_parser).
+-include_lib("ofx/include/records.hrl").
 -export([
     marshal/1,
     unmarshal/1
@@ -33,7 +33,7 @@ unmarshal(Text) ->
 % Lexes a string into a list of tags. The tags can be fed to parse_node
 % to generate an OFX document
 lex(Ofx) ->
-    {ok, Tags, _} = ofxconnect_leex:string(Ofx),
+    {ok, Tags, _} = ofx_leex:string(Ofx),
     Tags.
 
 % Parses a list of tags into an OFX data tree.
