@@ -2,7 +2,7 @@
 -compile([{parse_transform, lager_transform}]).
 -behaviour(gen_server).
 
--include("include/records.hrl").
+-include_lib("ofxconnect/include/records.hrl").
 -define(TIMEOUT, infinity).
 -define(CLIENTUID, "b2f82e64-ca94-45e1-b947-b9007cd3cd08").
 

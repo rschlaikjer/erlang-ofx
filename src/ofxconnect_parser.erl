@@ -1,5 +1,5 @@
 -module(ofxconnect_parser).
--include("include/records.hrl").
+-include_lib("ofxconnect/include/records.hrl").
 -export([
     marshal/1,
     unmarshal/1
