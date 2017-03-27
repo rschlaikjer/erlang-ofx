@@ -31,9 +31,7 @@ unmarshal(Text) ->
 % Lexes a string into a list of tags. The tags can be fed to parse_node
 % to generate an OFX document
 lex(Ofx) ->
-    leex:file('ofxconnect_leex.xrl'),
-    compile:file("ofxconnect_leex.erl"),
-    {ok, Tags, _} = ofx:string(Ofx),
+    {ok, Tags, _} = ofxconnect_leex:string(Ofx),
     Tags.
 
 % Parses a list of tags into an OFX data tree.
