@@ -20,6 +20,8 @@ marshal(#ofx_leaf{name=Name, value=Value}) ->
     ["<", Name, ">", Value].
 
 % Read a string into an OFX tree
+unmarshal(Text) when is_binary(Text) ->
+    unmarshal(binary_to_list(Text));
 unmarshal(Text) ->
     parse(lex(Text)).
 
