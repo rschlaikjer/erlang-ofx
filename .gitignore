@@ -3,3 +3,5 @@ _build/
 rebar.lock
 *.beam
 src/ofxconnect_test.erl
+log
+priv/ofxconnect_leex.erl
