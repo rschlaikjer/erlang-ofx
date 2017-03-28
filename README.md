@@ -2,6 +2,9 @@
 
 Small library for making OFX requests with Erlang.
 
+A blog post relating to this library can be found
+[on my website](https://rhye.org/post/parsing-ofx-leex/).
+
 For example, to list all your accounts:
 
     {ok, Client} = ofx:new_client(
