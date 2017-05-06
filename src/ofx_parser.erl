@@ -23,7 +23,10 @@ marshal(#ofx_leaf{name=Name, value=Value}) ->
 unmarshal(Text) when is_binary(Text) ->
     unmarshal(binary_to_list(Text));
 unmarshal(Text) ->
-    parse(lex(Text)).
+    case lex(Text) of
+        {ok, Tags} -> parse(Tags);
+        {error, Reason} -> {error, Reason}
+    end.
 
 
 %%
@@ -33,8 +36,10 @@ unmarshal(Text) ->
 % Lexes a string into a list of tags. The tags can be fed to parse_node
 % to generate an OFX document
 lex(Ofx) ->
-    {ok, Tags, _} = ofx_leex:string(Ofx),
-    Tags.
+    case ofx_leex:string(Ofx) of
+        {ok, Tags, _} -> {ok, Tags};
+        {error, Details} -> {error, {Details, Ofx}}
+    end.
 
 % Parses a list of tags into an OFX data tree.
 % Will error out in there are tokens that cannot be parsed as part of the tree.
