@@ -66,9 +66,13 @@ parse_node_list(_EndTag, [], Nodes) ->
     Nodes;
 parse_node_list(EndTag, [Tag|Tags], Nodes) ->
     {Node, Tags2} = parse_node([Tag|Tags]),
-    case hd(Tags2) of
-        {closetag, EndTag} ->
-            {[Node|Nodes], tl(Tags2)};
+    case Tags2 of
+        [] -> parse_node_list(EndTag, Tags2, [Node|Nodes]);
         _ ->
-            parse_node_list(EndTag, Tags2, [Node|Nodes])
+            case hd(Tags2) of
+                {closetag, EndTag} ->
+                    {[Node|Nodes], tl(Tags2)};
+                _ ->
+                    parse_node_list(EndTag, Tags2, [Node|Nodes])
+            end
     end.
