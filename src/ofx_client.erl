@@ -141,8 +141,12 @@ req_and_parse_resp(Url, OfxStanzas) ->
 
 extract_ofx_from_response(Response) ->
     % Find the index of the <OFX> start tag
-    {StartPos, _StartLen} = binary:match(Response, <<"<OFX>">>),
-    binary:part(Response, StartPos, byte_size(Response) - StartPos).
+    case binary:match(Response, <<"<OFX>">>) of
+        nomatch ->
+            throw({bad_ofx, Response});
+        {StartPos, _StartLen} ->
+            binary:part(Response, StartPos, byte_size(Response) - StartPos)
+    end.
 
 get_header() ->
     Headers =  [
