@@ -30,7 +30,15 @@
 }).
 
 %% Public methods
-start_link(Username, Password, Org, Fid, Url) ->
+start_link(Username, Password, Org, Fid, Url) when is_binary(Username) and is_binary(Password) and is_binary(Org) and is_binary(Fid) and is_binary(Url) ->
+    start_link(
+        binary_to_list(Username),
+        binary_to_list(Password),
+        binary_to_list(Org),
+        binary_to_list(Fid),
+        binary_to_list(Url)
+    );
+start_link(Username, Password, Org, Fid, Url) when is_list(Username) and is_list(Password) and is_list(Org) and is_list(Fid) and is_list(Url) ->
     gen_server:start_link(?MODULE, [Username, Password, Org, Fid, Url], []).
 
 get_transactions_checking(Client, BankId, AccountId, TimeStart, TimeEnd) ->
