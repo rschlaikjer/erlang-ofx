@@ -133,17 +133,17 @@ req_and_parse_resp(Url, OfxStanzas) ->
     % Send the request, read the raw response
     {ok, Response} = ofx_request(Url, Body),
 
-    % Remove the header from the response
-    OfxResponse = extract_ofx_from_response(Response),
-
-    % Parse and return the response
-    ofx_parser:unmarshal(OfxResponse).
+    % Remove the header from the response and unmarshal
+    case extract_ofx_from_response(Response) of
+        bad_ofx -> {error, bad_ofx};
+        Binary ->
+            {ok, ofx_parser:unmarshal(Binary)}
+    end.
 
 extract_ofx_from_response(Response) ->
     % Find the index of the <OFX> start tag
     case binary:match(Response, <<"<OFX>">>) of
-        nomatch ->
-            throw({bad_ofx, Response});
+        nomatch -> bad_ofx;
         {StartPos, _StartLen} ->
             binary:part(Response, StartPos, byte_size(Response) - StartPos)
     end.
