@@ -100,12 +100,22 @@ code_change(OldVsn, State, _Extra) ->
 
 %% Private methods
 
+ensure_list(BinOrList) when is_list(BinOrList) ->
+    BinOrList;
+ensure_list(BinOrList) when is_binary(BinOrList) ->
+    binary_to_list(BinOrList).
+
 do_transactions_checking(State=#state{}, BankId, AccountId, TimeStart, TimeEnd) ->
     req_and_parse_resp(
         State#state.ofx_url,
         [
             get_signon(State),
-            bank_message(BankId, AccountId, "CHECKING", TimeStart, TimeEnd)
+            bank_message(
+                ensure_list(BankId),
+                ensure_list(AccountId),
+                "CHECKING",
+                ensure_list(TimeStart),
+                ensure_list(TimeEnd))
     ]).
 
 do_transactions_credit(State=#state{}, AccountId, TimeStart, TimeEnd) ->
@@ -113,7 +123,10 @@ do_transactions_credit(State=#state{}, AccountId, TimeStart, TimeEnd) ->
         State#state.ofx_url,
         [
             get_signon(State),
-            ccard_message(AccountId, TimeStart, TimeEnd)
+            ccard_message(
+                ensure_list(AccountId),
+                ensure_list(TimeStart),
+                ensure_list(TimeEnd))
     ]).
 
 do_list_accounts(State=#state{}) ->
