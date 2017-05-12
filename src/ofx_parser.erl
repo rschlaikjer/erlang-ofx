@@ -45,8 +45,10 @@ lex(Ofx) ->
 % Will error out in there are tokens that cannot be parsed as part of the tree.
 parse(Tags) ->
     {Tree, Unparsed} = parse_node(Tags),
-    [] = Unparsed,
-    Tree.
+    case Unparsed of
+        [] -> {ok, Tree};
+        ExtraTags -> {error, {Tree, ExtraTags}}
+    end.
 
 % Parse a single OFX node from tokens.
 % Returns the node, and any unused tokens.

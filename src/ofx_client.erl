@@ -154,8 +154,7 @@ req_and_parse_resp(Url, OfxStanzas) ->
     % Remove the header from the response and unmarshal
     case extract_ofx_from_response(Response) of
         bad_ofx -> {error, bad_ofx};
-        Binary ->
-            {ok, ofx_parser:unmarshal(Binary)}
+        Binary -> ofx_parser:unmarshal(Binary)
     end.
 
 extract_ofx_from_response(Response) ->
