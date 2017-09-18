@@ -38,7 +38,7 @@ unmarshal(Text) ->
 lex(Ofx) ->
     case ofx_leex:string(Ofx) of
         {ok, Tags, _} -> {ok, Tags};
-        {error, Details} -> {error, {Details, Ofx}}
+        {error, Details, Line} -> {error, {Details, Line, Ofx}}
     end.
 
 % Parses a list of tags into an OFX data tree.
