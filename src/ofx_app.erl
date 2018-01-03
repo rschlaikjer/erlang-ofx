@@ -10,10 +10,7 @@ start(_StartType, _StartArgs) ->
 
 % Compile and load the leex lexer for OFX documents
 initialize_leex() ->
-    PrivDir = code:priv_dir(ofx),
-    {ok, CodeFile} = leex:file(filename:join([PrivDir, "ofx_leex.xrl"])),
-    {ok, ofx_leex} = compile:file(CodeFile).
-
+    ok.
 
 stop(_State) ->
     ok.

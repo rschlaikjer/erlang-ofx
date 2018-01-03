@@ -4,4 +4,4 @@ rebar.lock
 *.beam
 src/ofx_test.erl
 log
-priv/ofx_leex.erl
+src/ofx_leex.erl
