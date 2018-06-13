@@ -13,7 +13,7 @@
 -export([
     get_transactions_checking/5,
     get_transactions_credit/4,
-    get_transactions_investment/5,
+    get_transactions_investment/4,
     list_accounts/1
 ]).
 
@@ -59,10 +59,10 @@ get_transactions_credit(Client, AccountId, TimeStart, TimeEnd) ->
         {transactions_credit, AccountId, TimeStart, TimeEnd},
         ?TIMEOUT).
 
-get_transactions_investment(Client, BankId, AccountId, TimeStart, TimeEnd) ->
+get_transactions_investment(Client, AccountId, TimeStart, TimeEnd) ->
     gen_server:call(
         Client,
-        {transactions_investment, BankId, AccountId, TimeStart, TimeEnd},
+        {transactions_investment, AccountId, TimeStart, TimeEnd},
         ?TIMEOUT).
 
 list_accounts(Client) ->
@@ -84,9 +84,9 @@ handle_call({transactions_checking, BankId, AccountId, TimeStart, TimeEnd}, _Fro
 handle_call({transactions_credit, AccountId, TimeStart, TimeEnd}, _From, State) ->
     {reply, do_transactions_credit(
               State, AccountId, TimeStart, TimeEnd), State};
-handle_call({transactions_investment, BankId, AccountId, TimeStart, TimeEnd}, _From, State) ->
+handle_call({transactions_investment, AccountId, TimeStart, TimeEnd}, _From, State) ->
     {reply, do_transactions_investment(
-              State, BankId, AccountId, TimeStart, TimeEnd), State};
+              State, AccountId, TimeStart, TimeEnd), State};
 handle_call(list_accounts, _From, State) ->
     {reply, do_list_accounts(State), State};
 handle_call(Request, From, State) ->
@@ -139,13 +139,13 @@ do_transactions_credit(State=#state{}, AccountId, TimeStart, TimeEnd) ->
                 ensure_list(TimeEnd))
     ]).
 
-do_transactions_investment(State=#state{}, BankId, AccountId, TimeStart, TimeEnd) ->
+do_transactions_investment(State=#state{}, AccountId, TimeStart, TimeEnd) ->
     req_and_parse_resp(
         State#state.ofx_url,
         [
             get_signon(State),
             investment_statement_request(
-                ensure_list(BankId),
+                State#state.org,
                 ensure_list(AccountId),
                 ensure_list(TimeStart),
                 ensure_list(TimeEnd))
