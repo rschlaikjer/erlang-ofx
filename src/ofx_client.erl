@@ -13,6 +13,7 @@
 -export([
     get_transactions_checking/5,
     get_transactions_credit/4,
+    get_transactions_investment/5,
     list_accounts/1
 ]).
 
@@ -58,6 +59,12 @@ get_transactions_credit(Client, AccountId, TimeStart, TimeEnd) ->
         {transactions_credit, AccountId, TimeStart, TimeEnd},
         ?TIMEOUT).
 
+get_transactions_investment(Client, BankId, AccountId, TimeStart, TimeEnd) ->
+    gen_server:call(
+        Client,
+        {transactions_investment, BankId, AccountId, TimeStart, TimeEnd},
+        ?TIMEOUT).
+
 list_accounts(Client) ->
     gen_server:call(Client, list_accounts, ?TIMEOUT).
 
@@ -77,6 +84,9 @@ handle_call({transactions_checking, BankId, AccountId, TimeStart, TimeEnd}, _Fro
 handle_call({transactions_credit, AccountId, TimeStart, TimeEnd}, _From, State) ->
     {reply, do_transactions_credit(
               State, AccountId, TimeStart, TimeEnd), State};
+handle_call({transactions_investment, BankId, AccountId, TimeStart, TimeEnd}, _From, State) ->
+    {reply, do_transactions_investment(
+              State, BankId, AccountId, TimeStart, TimeEnd), State};
 handle_call(list_accounts, _From, State) ->
     {reply, do_list_accounts(State), State};
 handle_call(Request, From, State) ->
@@ -110,7 +120,7 @@ do_transactions_checking(State=#state{}, BankId, AccountId, TimeStart, TimeEnd) 
         State#state.ofx_url,
         [
             get_signon(State),
-            bank_message(
+            statement_request(
                 ensure_list(BankId),
                 ensure_list(AccountId),
                 "CHECKING",
@@ -123,7 +133,19 @@ do_transactions_credit(State=#state{}, AccountId, TimeStart, TimeEnd) ->
         State#state.ofx_url,
         [
             get_signon(State),
-            ccard_message(
+            ccard_statement_request(
+                ensure_list(AccountId),
+                ensure_list(TimeStart),
+                ensure_list(TimeEnd))
+    ]).
+
+do_transactions_investment(State=#state{}, BankId, AccountId, TimeStart, TimeEnd) ->
+    req_and_parse_resp(
+        State#state.ofx_url,
+        [
+            get_signon(State),
+            investment_statement_request(
+                ensure_list(BankId),
                 ensure_list(AccountId),
                 ensure_list(TimeStart),
                 ensure_list(TimeEnd))
@@ -224,7 +246,7 @@ list_accounts() ->
         ]}
     ]}.
 
-bank_message(BankId, AccountId, AccountType, TimeStart, TimeEnd) ->
+statement_request(BankId, AccountId, AccountType, TimeStart, TimeEnd) ->
     #ofx_node{name="BANKMSGSRQV1", children=[
         #ofx_node{name="STMTTRNRQ", children=[
             #ofx_leaf{name="TRNUID", value=uuid:to_string(uuid:uuid4())},
@@ -244,7 +266,32 @@ bank_message(BankId, AccountId, AccountType, TimeStart, TimeEnd) ->
         ]}
     ]}.
 
-ccard_message(AccountId, TimeStart, TimeEnd) ->
+investment_statement_request(BankId, AccountId, TimeStart, TimeEnd) ->
+    #ofx_node{name="INVSTMTMSGSRQV1", children=[
+        #ofx_node{name="INVSTMTTRNRQ", children=[
+            #ofx_leaf{name="TRNUID", value=uuid:to_string(uuid:uuid4())},
+            #ofx_leaf{name="CLTCOOKIE", value="1"},
+            #ofx_node{name="INVSTMTRQ", children=[
+                #ofx_node{name="INVACCTFROM", children=[
+                    #ofx_leaf{name="BROKERID", value=BankId},
+                    #ofx_leaf{name="ACCTID", value=AccountId}
+                ]},
+                #ofx_node{name="INCTRAN", children=[
+                    #ofx_leaf{name="DTSTART", value=TimeStart},
+                    #ofx_leaf{name="DTEND", value=TimeEnd},
+                    #ofx_leaf{name="INCLUDE", value="Y"}
+                ]},
+                #ofx_leaf{name="INCOO", value="Y"},
+                #ofx_node{name="INCPOS", children=[
+                    #ofx_leaf{name="DTASOF", value=TimeEnd},
+                    #ofx_leaf{name="INCLUDE", value="Y"}
+                ]},
+                #ofx_leaf{name="INCBAL", value="Y"}
+            ]}
+        ]}
+    ]}.
+
+ccard_statement_request(AccountId, TimeStart, TimeEnd) ->
     #ofx_node{name="CREDITCARDMSGSRQV1", children=[
         #ofx_node{name="CCSTMTTRNRQ", children=[
             #ofx_leaf{name="TRNUID", value=uuid:to_string(uuid:uuid4())},
