@@ -5,5 +5,6 @@
 ]).
 
 new_client(Username, Password, Org, Fid, Url) ->
-    ofx_sup:new_client(Username, Password, Org, Fid, Url).
-
+    {ok, Pid} = ofx_sup:new_client(Username, Password, Org, Fid, Url),
+    link(Pid),
+    {ok, Pid}.
