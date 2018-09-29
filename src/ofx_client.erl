@@ -319,7 +319,7 @@ ofx_request(Url, Body) ->
     {ok, {_, _, Resp}} = httpc:request(
         post,
         {Url, Headers, ContentType, lists:flatten(Body)},
-        [],
+        [{ssl, [{versions, ['tlsv1.2']}]}],
         [{body_format, binary}]
     ),
     {ok, Resp}.
