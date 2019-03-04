@@ -65,7 +65,7 @@ parse_node_list(EndTag, Tags) ->
 % Parses a list of child nodes. Stops parsing when a {closetag, } tuple is found
 % with a name matching the EndTag.
 parse_node_list(_EndTag, [], Nodes) ->
-    Nodes;
+    {Nodes, []};
 parse_node_list(EndTag, [Tag|Tags], Nodes) ->
     {Node, Tags2} = parse_node([Tag|Tags]),
     case Tags2 of
