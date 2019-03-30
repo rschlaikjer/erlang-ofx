@@ -12,6 +12,7 @@
 %% Public methos
 -export([
     get_transactions_checking/5,
+    get_transactions_savings/5,
     get_transactions_credit/4,
     get_transactions_investment/4,
     list_accounts/1
@@ -53,6 +54,12 @@ get_transactions_checking(Client, BankId, AccountId, TimeStart, TimeEnd) ->
         {transactions_checking, BankId, AccountId, TimeStart, TimeEnd},
         ?TIMEOUT).
 
+get_transactions_savings(Client, BankId, AccountId, TimeStart, TimeEnd) ->
+    gen_server:call(
+        Client,
+        {transactions_savings, BankId, AccountId, TimeStart, TimeEnd},
+        ?TIMEOUT).
+
 get_transactions_credit(Client, AccountId, TimeStart, TimeEnd) ->
     gen_server:call(
         Client,
@@ -80,6 +87,9 @@ init([Username, Password, Org, Fid, Url]) ->
 
 handle_call({transactions_checking, BankId, AccountId, TimeStart, TimeEnd}, _From, State) ->
     {reply, do_transactions_checking(
+              State, BankId, AccountId, TimeStart, TimeEnd), State};
+handle_call({transactions_savings, BankId, AccountId, TimeStart, TimeEnd}, _From, State) ->
+    {reply, do_transactions_savings(
               State, BankId, AccountId, TimeStart, TimeEnd), State};
 handle_call({transactions_credit, AccountId, TimeStart, TimeEnd}, _From, State) ->
     {reply, do_transactions_credit(
@@ -124,6 +134,19 @@ do_transactions_checking(State=#state{}, BankId, AccountId, TimeStart, TimeEnd) 
                 ensure_list(BankId),
                 ensure_list(AccountId),
                 "CHECKING",
+                ensure_list(TimeStart),
+                ensure_list(TimeEnd))
+    ]).
+
+do_transactions_savings(State=#state{}, BankId, AccountId, TimeStart, TimeEnd) ->
+    req_and_parse_resp(
+        State#state.ofx_url,
+        [
+            get_signon(State),
+            statement_request(
+                ensure_list(BankId),
+                ensure_list(AccountId),
+                "SAVINGS",
                 ensure_list(TimeStart),
                 ensure_list(TimeEnd))
     ]).
