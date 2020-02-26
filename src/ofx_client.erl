@@ -194,12 +194,14 @@ req_and_parse_resp(Url, OfxStanzas) ->
     Body = [get_header(), "\n\n", OfxDocument],
 
     % Send the request, read the raw response
-    {ok, Response} = ofx_request(Url, Body),
-
-    % Remove the header from the response and unmarshal
-    case extract_ofx_from_response(Response) of
-        bad_ofx -> {error, bad_ofx};
-        Binary -> ofx_parser:unmarshal(Binary)
+    case ofx_request(Url, Body) of
+        {error, Reason} -> {error, Reason};
+        {ok, Response} ->
+            % Remove the header from the response and unmarshal
+            case extract_ofx_from_response(Response) of
+                bad_ofx -> {error, bad_ofx};
+                Binary -> ofx_parser:unmarshal(Binary)
+            end
     end.
 
 extract_ofx_from_response(Response) ->
@@ -339,10 +341,12 @@ ofx_request(Url, Body) ->
         {"accept", "*/*, application/x-ofx"}
     ],
     ContentType = "application/x-ofx",
-    {ok, {_, _, Resp}} = httpc:request(
+    case httpc:request(
         post,
         {Url, Headers, ContentType, lists:flatten(Body)},
         [{ssl, [{versions, ['tlsv1.2']}]}],
         [{body_format, binary}]
-    ),
-    {ok, Resp}.
+    ) of
+        {ok, {_, _, Resp}} -> {ok, Resp};
+        {error, Reason} -> {error, Reason}
+    end.
